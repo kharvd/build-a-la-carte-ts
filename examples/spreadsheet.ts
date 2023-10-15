@@ -38,8 +38,8 @@ const store = initializeStoreImpl(undefined, (key: CellKey): number =>
   key === "A1" ? 10 : 20
 );
 const result = busy(sprsh1, "B2", store);
-console.log(result.getValue("B1")); // 30
-console.log(result.getValue("B2")); // 60
+console.log("B1:", result.getValue("B1")); // 30
+console.log("B2:", result.getValue("B2")); // 60
 
 function compute<Info, Key, Value>(
   task: Task<MonadHKT, Key, Value>,
@@ -50,7 +50,7 @@ function compute<Info, Key, Value>(
     .runIdentity();
 }
 
-console.log(compute(sprsh1("B1")!, result));
+console.log("compute('B1'):", compute(sprsh1("B1")!, result));
 
 // ======================================================================
 
@@ -61,11 +61,11 @@ function dependencies<Key, Value>(
   return task.runTask(applicative, (k: Key) => makeConst([k])).getConst;
 }
 
-console.log(dependencies(sprsh1("B1")!));
+console.log("dependencies('B1'):", dependencies(sprsh1("B1")!));
 
 // ======================================================================
 
-function busyDeps<Key, Value>(
+function fullDeps<Key, Value>(
   tasks: Tasks<ApplicativeHKT, Key, Value>,
   key: Key
 ): Store<void, Key, Value> {
@@ -84,7 +84,8 @@ function busyDeps<Key, Value>(
   return fetch(key);
 }
 
-console.dir(busyDeps(sprsh1, "B2"), { depth: null });
+console.log("fullDeps('B2'):");
+console.dir(fullDeps(sprsh1, "B2"), { depth: null });
 
 // ======================================================================
 
