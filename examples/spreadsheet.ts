@@ -10,6 +10,7 @@ import { initializeStoreImpl } from "../build";
 import { Task } from "../build";
 import { Tasks } from "../build";
 import { busy } from "../build";
+import { dependencies } from "../build";
 
 type CellKey = "A1" | "A2" | "A3" | "B1" | "B2" | "B3" | "C1" | "C2" | "C3";
 
@@ -34,9 +35,10 @@ const sprsh1: Tasks<ApplicativeHKT, CellKey, number> = (k: CellKey) => {
   return null;
 };
 
-const store = initializeStoreImpl(undefined, (key: CellKey): number =>
-  key === "A1" ? 10 : 20
-);
+const store = initializeStoreImpl(undefined, {
+  A1: 10,
+  A2: 20,
+});
 const result = busy(sprsh1, "B2", store);
 console.log("B1:", result.getValue("B1")); // 30
 console.log("B2:", result.getValue("B2")); // 60
@@ -53,13 +55,6 @@ function compute<Info, Key, Value>(
 console.log("compute('B1'):", compute(sprsh1("B1")!, result));
 
 // ======================================================================
-
-function dependencies<Key, Value>(
-  task: Task<ApplicativeHKT, Key, Value>
-): Key[] {
-  const applicative = applicativeConst<Key[]>(new MonoidArray());
-  return task.runTask(applicative, (k: Key) => makeConst([k])).getConst;
-}
 
 console.log("dependencies('B1'):", dependencies(sprsh1("B1")!));
 
@@ -111,9 +106,10 @@ const sprsh2: Tasks<MonadHKT, CellKey, number> = (k: CellKey) => {
   return null;
 };
 
-const store2 = initializeStoreImpl(undefined, (key: CellKey): number =>
-  key === "A1" ? 10 : key === "A2" ? 20 : 1
-);
+const store2 = initializeStoreImpl(undefined, {
+  A1: 10,
+  A2: 20,
+});
 
 const result2 = busy(sprsh2, "B1", store2);
 console.log(result2.getValue("B1")); // 10

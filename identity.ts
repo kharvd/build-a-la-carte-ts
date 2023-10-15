@@ -7,7 +7,7 @@ export type Identity<T> = {
   runIdentity(): T;
 };
 
-interface IdentityHKT extends HKT {
+export interface IdentityHKT extends HKT {
   new: (x: this["_1"]) => Identity<typeof x>;
 }
 

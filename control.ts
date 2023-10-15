@@ -1,5 +1,4 @@
 import { HKT, Apply } from "./hkt";
-import { Assume } from "./hkt";
 
 export interface Functor<F extends HKT> {
   fmap<T, U>(f: (t: T) => U, ft: Apply<F, T>): Apply<F, U>;
@@ -13,7 +12,8 @@ export interface Applicative<F extends HKT> extends Functor<F> {
 }
 
 export interface ApplicativeHKT extends HKT {
-  new: (x: Assume<this["_1"], HKT>) => Applicative<typeof x>;
+  new: (x: this["_1"]) => Applicative<typeof x>;
+  _1: HKT;
 }
 
 export function liftA2<A, B, C, F extends HKT>(
@@ -29,5 +29,17 @@ export interface Monad<F extends HKT> extends Applicative<F> {
 }
 
 export interface MonadHKT extends HKT {
-  new: (x: Assume<this["_1"], HKT>) => Monad<typeof x>;
+  new: (x: this["_1"]) => Monad<typeof x>;
+  _1: HKT;
+}
+
+export function mapM_<F extends HKT, A, B>(
+  monad: Monad<F>,
+  f: (a: A) => Apply<F, B>,
+  as: A[]
+): Apply<F, void> {
+  return as.reduce(
+    (acc, a) => monad.flatMap(acc, () => f(a)),
+    monad.pure(undefined)
+  );
 }
